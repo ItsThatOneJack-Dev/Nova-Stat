@@ -14,7 +14,6 @@ def GetIDByName(Username):
         if data["data"] and len(data["data"]) > 0:
             return data["data"][0]["id"]
         else:
-            print(f"No user found with username: {Username}")
             return None
     else:
         print(f"Error: HTTP-ID-{response.status_code}")
@@ -34,10 +33,12 @@ def GetGroupsInfo(UserID):
         return None
 
 def ParseGroupsInfo(GroupsInfo):
-    result = {"Clearance": None,"ClearanceID": None,"Departments": []}
+    result = {"Clearance": None,"ClearanceID": None,"IsVIP": None,"Departments": []}
     department_group_ids = [5508925, 4971982, 4971979, 4971978, 4971973]
     nova_group_id = 4965800
     department_info = {}
+
+    InNova = False
     
     for group_info in GroupsInfo["data"]:
         group_id = group_info["group"]["id"]
@@ -45,6 +46,8 @@ def ParseGroupsInfo(GroupsInfo):
         if group_id == nova_group_id:
             result["Clearance"] = group_info["role"]["name"]
             result["ClearanceID"] = group_info["role"]["rank"]
+            result["IsVIP"] = group_info["role"]["name"] in ["Class - A", "Class - O", "Class - X"]
+            InNova = True
         
         if group_id in department_group_ids:
             department_info[group_id] = {
@@ -52,6 +55,11 @@ def ParseGroupsInfo(GroupsInfo):
                 "Rank": group_info["role"]["name"],
                 "RankID": group_info["role"]["rank"]
             }
+
+    if not InNova:
+        print()
+        print(f"[bold red]The person \"{Username}\" is not a member of Nova Corporation staff.")
+        quit()
 
     for dept_id in department_group_ids:
         if dept_id in department_info:
@@ -70,6 +78,9 @@ if __name__ == "__main__":
             print(f"[italic purple]{Username}{OwnershipSuffix}[/italic purple] Statistics")
             print("")
             print(f"[italic blue] Clearance: [/italic blue]{Result['Clearance']} (ID: {Result['ClearanceID']})")
+            if Result["IsVIP"]:
+                print()
+                print("[yellow] This person is a VIP.[/yellow]")
             print("")
             if Result["Departments"]:
                 table = Table(show_header=True, header_style="bold italic blue", box=None)
@@ -79,8 +90,8 @@ if __name__ == "__main__":
                     table.add_row(dept["Department"],f"{dept['Rank']} (ID: [cyan]{dept['RankID']}[/cyan])")
                 print(table)
             else:
-                print("[italic yellow]No departments found from the specified list.[/italic yellow]")
+                print(f"[bold red]The person \"{Username}\" is not a member of any Nova Corporation Departments.[/bold red]")
         else:
-            print(f"[bold red]Could not retrieve group information for {Username}[/bold red]")
+            print(f"[bold red]Could not retrieve group information for \"{Username}\", is the Roblox API down?[/bold red]")
     else:
-        print(f"[bold red]Could not retrieve user ID for {Username}[/bold red]")
+        print(f"[bold red]Could not retrieve ID for \"{Username}\", does this person exist?[/bold red]")
