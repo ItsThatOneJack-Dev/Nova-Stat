@@ -46,7 +46,7 @@ def ParseGroupsInfo(GroupsInfo):
         if group_id == nova_group_id:
             result["Clearance"] = group_info["role"]["name"]
             result["ClearanceID"] = group_info["role"]["rank"]
-            result["IsVIP"] = group_info["role"]["name"] in ["Class - A", "Class - O", "Class - X"]
+            result["IsVIP"] = group_info["role"]["rank"]>=6
             InNova = True
         
         if group_id in department_group_ids:
