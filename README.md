@@ -6,10 +6,11 @@ Nova-Stat is a program designed to display statistic information about a player 
 
 ## Features
 
-- Per-Department Ranks
-- Clearance Level
+- Per-Department Rank Information
+- Clearance Level Information
+- Clearance-based VIP Checking
 
-I may add more features in future.
+I may add more features in the future.
 
 ## Extra Information
 
